@@ -34,6 +34,9 @@ The class imbalance has been ignored, but it has contributed majorly to the poor
 #### Using all three combined
 ![combined](images/combined_feature_selection.png)
 
+### Frontend (GUI)
+![gui](images/frontend.png)
+
 ## Author
 | <img src="https://avatars.githubusercontent.com/u/20398468?v=4" width="100" height="100" /> |
   :---: 

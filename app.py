@@ -1,7 +1,9 @@
 from main import main as get_model
 from flask import Flask, request
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 tfidf = True
 ttc = True

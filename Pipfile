@@ -9,6 +9,7 @@ nltk = "*"
 scikit-learn = "*"
 numpy = "*"
 pandas = "*"
+flask = "*"
 
 [dev-packages]
 

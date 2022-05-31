@@ -1,37 +1,48 @@
 import numpy as np
 from preprocessor import PreProcessor
 
+preprocessor = PreProcessor()
+
 class Vectorizer:
 	def __init__(self):
 		self.train_vector = None
 		self.features = []
-		self.preprocessor = PreProcessor()
 
-	def tfidf_vectorize(self, content):
+	def vectorize(self, content, is_binary=False):
+		global preprocessor
 		feature_counts = {}
 		test_vector = np.zeros((1, len(self.features)), np.float32)
 
-		# calc freq
-		for feature in self.preprocessor.get_tokens(content):
-			if feature not in feature_counts:
-				feature_counts[feature] = 0
-			
-			feature_counts[feature] += 1
+		if is_binary:
+			for feature in list(set(preprocessor.get_tokens(content))):
+				try:
+					feature_index = self.features.index(feature)
+				except ValueError:
+					continue
 
-		for feature in feature_counts:
-			tf = np.log10(1 + feature_counts[feature])
-			# no need to multiply with idf, since it'd be 0
+				test_vector[0][feature_index] = 1
+		else:
+			# calc freq
+			for feature in preprocessor.get_tokens(content):
+				if feature not in feature_counts:
+					feature_counts[feature] = 0
+				
+				feature_counts[feature] += 1
 
-			try:
-				feature_index = self.features.index(feature)
-			except ValueError:
-				continue
+			for feature in feature_counts:
+				tf = np.log10(1 + feature_counts[feature])
+				# no need to multiply with idf, since it'd be 0
 
-			test_vector[0][feature_index] = tf
+				try:
+					feature_index = self.features.index(feature)
+				except ValueError:
+					continue
+
+				test_vector[0][feature_index] = tf
 
 		return test_vector
 
-	def fit_transform(self, doc_features):
+	def fit_transform(self, doc_features, is_binary=False):
 		for doc in doc_features:
 			for feature in doc_features[doc]:
 				if feature not in self.features:
@@ -40,15 +51,25 @@ class Vectorizer:
 		# sort features alphabetically
 		self.features.sort()
 
-		doc_count = len(doc_features.keys())
+		doc_keys = list(doc_features.keys())
+		doc_count = len(doc_keys)
+		doc_index_map = {}
+		for doc in doc_features:
+			doc_index_map[doc] = doc_keys.index(doc)
+
 		feature_count = len(self.features)
 		self.train_vector = np.zeros((doc_count, feature_count), np.float32)
 
 		feature_index = 0
 		for feature in self.features:
 			for doc in doc_features:
+				_doc_index = doc_index_map[doc]
+				if is_binary:
+					self.train_vector[_doc_index][feature_index] = feature in doc_features[doc]
+					continue
+
 				if feature in doc_features[doc]:
-					self.train_vector[doc][feature_index] = doc_features[doc][feature]["tfidf"]
+					self.train_vector[_doc_index][feature_index] = doc_features[doc][feature]["tfidf"]
 
 			feature_index += 1
 

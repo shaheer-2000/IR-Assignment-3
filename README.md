@@ -1,5 +1,9 @@
 # IR-Assignment-3
 
+## How to start
+- `pipenv install` to install the required packages
+- `pipenv run python app.py` to get the server up at `localhost:5000`
+
 ## Description
 This IR Assignment requires students to:
 - Perform feature selection, using 4 approaches
